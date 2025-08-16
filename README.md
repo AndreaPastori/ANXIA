@@ -1,361 +1,4 @@
-# ANXIA
-function blendColors(color1, color2) {
-            const hex1 = color1.replace('#', '');
-            const hex2 = color2.replace('#', '');
-            
-            const r1 = parseInt(hex1.substr(0, 2), 16);
-            const g1 = parseInt(hex1.substr(2, 2), 16);
-            const b1 = parseInt(hex1.substr(4, 2), 16);
-            
-            const r2 = parseInt(hex2.substr(0, 2), 16);
-            const g2 = parseInt(hex2.substr(2, 2), 16);
-            const b2 = parseInt(hex2.substr(4, 2), 16);
-            
-            const r = Math.round((r1 + r2) / 2);
-            const g = Math.round((g1 + g2) / 2);
-            const b = Math.round((b1 + b2) / 2);
-            
-            return `rgb(${r}, ${g}, ${b})`;
-        }
-
-        // Daily puzzle game
-        const puzzleAdvices = [
-            "Ogni problema ha una soluzione, anche se non è subito visibile. Abbi pazienza! 🧩",
-            "Come questo puzzle, la vita si ricompone pezzo per pezzo. Non affrettarti! 🌟",
-            "La perseveranza è la chiave del successo. Ogni tentativo ti avvicina alla meta! 💪",
-            "Anche i puzzle più difficili si risolvono con calma e determinazione! 🌈",
-            "Celebra ogni piccola vittoria, come questo puzzle completato! 🎉",
-            "La mente rilassata trova soluzioni più facilmente. Respira e riprova! 🌸",
-            "Ogni giorno è un nuovo puzzle da risolvere. Sei capace! ⭐"
-        ];
-
-        let currentPuzzle = [];
-        let puzzleSolution = [1, 2, 3, 4, 5, 6, 7, 8, ''];
-        let emptyIndex = 8;
-
-        function initializePuzzle() {
-            // Generate daily puzzle based on current date
-            const today = new Date();
-            const seed = today.getDate() + today.getMonth() * 30;
-            
-            currentPuzzle = [1, 2, 3, 4, 5, 6, 7, 8, ''];
-            
-            // Shuffle puzzle based on date seed
-            for (let i = 0; i < 50 + (seed % 20); i++) {
-                const moves = getPossibleMoves();
-                const randomMove = moves[Math.floor(Math.random() * moves.length)];
-                movePiece(randomMove, false);
-            }
-            
-            drawPuzzle();
-            
-            // Update date display
-            const dateStr = today.toLocaleDateString('it-IT', { 
-                weekday: 'long', 
-                day: 'numeric', 
-                month: 'long' 
-            });
-            document.getElementById('puzzleDate').textContent = `Puzzle di ${dateStr}`;
-        }
-
-        function drawPuzzle() {
-            const grid = document.getElementById('puzzleGrid');
-            if (!grid) return;
-            
-            grid.innerHTML = '';
-            
-            currentPuzzle.forEach((piece, index) => {
-                const pieceElement = document.createElement('div');
-                pieceElement.className = 'puzzle-piece';
-                pieceElement.textContent = piece;
-                pieceElement.onclick = () => movePiece(index, true);
-                
-                if (piece === '') {
-                    pieceElement.style.opacity = '0';
-                    pieceElement.style.cursor = 'default';
-                }
-                
-                grid.appendChild(pieceElement);
-            });
-        }
-
-        function getPossibleMoves() {
-            const moves = [];
-            const row = Math.floor(emptyIndex / 3);
-            const col = emptyIndex % 3;
-            
-            // Up
-            if (row > 0) moves.push(emptyIndex - 3);
-            // Down
-            if (row < 2) moves.push(emptyIndex + 3);
-            // Left
-            if (col > 0) moves.push(emptyIndex - 1);
-            // Right
-            if (col < 2) moves.push(emptyIndex + 1);
-            
-            return moves;
-        }
-
-        function movePiece(index, checkWin = true) {
-            const possibleMoves = getPossibleMoves();
-            
-            if (possibleMoves.includes(index)) {
-                // Swap piece with empty space
-                currentPuzzle[emptyIndex] = currentPuzzle[index];
-                currentPuzzle[index] = '';
-                emptyIndex = index;
-                
-                drawPuzzle();
-                
-                if (checkWin && isPuzzleSolved()) {
-                    setTimeout(() => {
-                        const todayAdvice = puzzleAdvices[new Date().getDate() % puzzleAdvices.length];
-                        showAdvice(todayAdvice);
-                        navigator.vibrate && navigator.vibrate([200, 100, 200, 100, 300]);
-                        showTemporaryMessage('Puzzle completato! 🎉');
-                    }, 500);
-                }
-            }
-        }
-
-        function isPuzzleSolved() {
-            for (let i = 0; i < puzzleSolution.length; i++) {
-                if (currentPuzzle[i] !== puzzleSolution[i]) {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        // Remove old emoji change function
-        function changeEmoji(element) {
-            // This        // Enhanced mood tracking with chart
-        let moodData = [
-            {day: 'Lun', mood: 6}, {day: 'Mar', mood: 4}, {day: 'Mer', mood: 7}, 
-            {day: 'Gio', mood: 5}, {day: 'Ven', mood: 8}, {day: 'Sab', mood: 6}, {day: 'Dom', mood: 7}
-        ];
-
-        function updateMood(value) {
-            document.getElementById('moodDisplay').textContent = moods[value - 1];
-            drawMoodChart();
-        }
-
-        function drawMoodChart() {
-            const svg = document.getElementById('moodChart');
-            if (!svg) return;
-            
-            svg.innerHTML = '';
-            
-            const width = 300;
-            const height = 200;
-            const padding = 30;
-            const chartWidth = width - (padding * 2);
-            const chartHeight = height - (padding * 2);
-            
-            // Draw axes
-            const xAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            xAxis.setAttribute('x1', padding);
-            xAxis.setAttribute('y1', height - padding);
-            xAxis.setAttribute('x2', width - padding);
-            xAxis.setAttribute('y2', height - padding);
-            xAxis.setAttribute('stroke', '#c7dae6');
-            xAxis.setAttribute('stroke-width', '2');
-            svg.appendChild(xAxis);
-            
-            const yAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            yAxis.setAttribute('x1', padding);
-            yAxis.setAttribute('y1', padding);
-            yAxis.setAttribute('x2', padding);
-            yAxis.setAttribute('y2', height - padding);
-            yAxis.setAttribute('stroke', '#c7dae6');
-            yAxis.setAttribute('stroke-width', '2');
-            svg.appendChild(yAxis);
-            
-            // Draw line and points
-            let pathData = '';
-            moodData.forEach((data, index) => {
-                const x = padding + (index * (chartWidth / (moodData.length - 1)));
-                const y = height - padding - ((data.mood - 1) * (chartHeight / 9));
-                
-                if (index === 0) {
-                    pathData += `M ${x} ${y}`;
-                } else {
-                    pathData += ` L ${x} ${y}`;
-                }
-                
-                // Add point
-                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-                circle.setAttribute('cx', x);
-                circle.setAttribute('cy', y);
-                circle.setAttribute('class', 'chart-point');
-                svg.appendChild(circle);
-                
-                // Add day label
-                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                text.setAttribute('x', x);
-                text.setAttribute('y', height - 10);
-                text.setAttribute('text-anchor', 'middle');
-                text.setAttribute('font-size', '12');
-                text.setAttribute('fill', '#587d8e');
-                text.textContent = data.day;
-                svg.appendChild(text);
-            });
-            
-            // Draw line
-            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-            path.setAttribute('d', pathData);
-            path.setAttribute('class', 'chart-line');
-            svg.appendChild(path);
-        }
-
-        function saveEntry() {
-            const mood = document.getElementById('moodSlider').value;
-            const note = document.getElementById('noteText').value;
-            const now = new Date();
-            const time = now.toLocaleTimeString('it-IT', {hour: '2-digit', minute:'2-digit'});
-            
-            if (note.trim()) {
-                // Update today's mood in chart data
-                moodData[moodData.length - 1].mood = parseInt(mood);
-                drawMoodChart();
-                
-                const entry = document.createElement('div');
-                entry.className = 'diary-entry';
-                entry.innerHTML = `
-                    <strong>Oggi - ${time}</strong><br>
-                    ${moods[mood - 1]}<br>
-                    <em>"${note}"</em>
-                `;
-                
-                document.getElementById('diaryEntries').insertBefore(entry, document.getElementById('diaryEntries').firstChild);
-                document.getElementById('noteText').value = '';
-                
-                navigator.vibrate && navigator.vibrate([100, 100, 100]);
-                showTemporaryMessage('Momento salvato! 📝');
-            }
-        }
-
-        function shareSticker(stickerText, advice) {
-            // Show advice popup first
-            showAdvice(advice);
-            
-            // Then handle sharing after a delay
-            setTimeout(() => {
-                if (navigator.share) {
-                    navigator.share({
-                        title: 'Kit d\'Ansia Tascabile',
-                        text: `${stickerText} - Dal mio kit antistress`,
-                    });
-                } else {
-                    navigator.clipboard.writeText(`${stickerText} - Dal mio Kit d'Ansia Tascabile`).then(() => {
-                        showTemporaryMessage('Sticker copiato! 📋');
-                    });
-                }
-            }, 100);
-        }
-
-        function showAdvice(advice) {
-            const overlay = document.createElement('div');
-            overlay.className = 'overlay';
-            overlay.onclick = closeAdvice;
-            
-            const popup = document.createElement('div');
-            popup.className = 'advice-popup';
-            popup.innerHTML = `
-                <h3>💡 Consiglio del Giorno</h3>
-                <p>${advice}</p>
-                <button class="close-advice" onclick="closeAdvice()">Grazie! ✨</button>
-            `;
-            
-            document.body.appendChild(overlay);
-            document.body.appendChild(popup);
-        }
-
-        function closeAdvice() {
-            const overlay = document.querySelector('.overlay');
-            const popup = document.querySelector('.advice-popup');
-            if (overlay) overlay.remove();
-            if (popup) popup.remove();
-        }
-
-        // Enhanced scratch game with random messages
-        const scratchMessages = [
-            "Sei più forte di quanto pensi! 💪",
-            "Questo momento passerà! 🌈",
-            "Respira, sei al sicuro! 🌸",
-            "Credi in te stesso! ⭐",
-            "Un passo alla volta! 🦋",
-            "Sei amato e importante! 💝",
-            "Il coraggio cresce con l'azione! 🌺",
-            "Ogni tempesta finisce! ☀️",
-            "La tua resilienza è incredibile! 🕊️"
-        ];
-
-        function resetScratch() {
-            document.getElementById('scratchOverlay').style.opacity = '1';
-            scratchRevealed = false;
-            scratchProgress = 0;
-            isScratching = false;
-            
-            // Set random message
-            const randomMessage = scratchMessages[Math.floor(Math.random() * scratchMessages.length)];
-            document.getElementById('hiddenMessage').textContent = randomMessage;
-            
-            navigator.vibrate && navigator.vibrate(100);
-        }
-
-        // Color mixing game
-        let selectedColors = [];
-        let colorNames = [];
-
-        function selectColor(element, color, name) {
-            if (selectedColors.length < 2) {
-                element.classList.add('selected');
-                selectedColors.push(color);
-                colorNames.push(name);
-                
-                if (selectedColors.length === 2) {
-                    mixColors();
-                }
-            }
-        }
-
-        function mixColors() {
-            const result = document.getElementById('colorResult');
-            const color1 = selectedColors[0];
-            const color2 = selectedColors[1];
-            
-            // Simple color mixing logic
-            const mixedColor = blendColors(color1, color2);
-            result.style.backgroundColor = mixedColor;
-            result.textContent = `${colorNames[0]} + ${colorNames[1]} = Relax`;
-            
-            setTimeout(() => {
-                // Reset
-                document.querySelectorAll('.color-circle').forEach(circle => {
-                    circle.classList.remove('selected');
-                });
-                selectedColors = [];
-                colorNames = [];
-                result.style.backgroundColor = '#f4efeb';
-                result.textContent = 'Scegli due colori';
-            }, 3000);
-        }
-
-        function blendColors(color1, color2) {
-            const hex1 = color1.replace('#', '');
-            const hex2 = color2.replace('#', '');
-            
-            const r1 = parseInt(hex1.substr(0, 2), 16);
-            const g1 = parseInt(hex1.substr(2, 2), 16);
-            const b1 = parseInt(hex1.substr(4, 2), 16);
-            
-            const r2 = parseInt(hex2.substr(0, 2), 16);
-            const g2 = parseInt(hex2.substr(2, 2), 16);
-            const b2 = parseInt(hex2.substr(4, 2), 16);
-            
-            const r = Math.round((r1 + r2) / 2);
-            const g = Math.round((g1 + g2)<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
@@ -625,214 +268,22 @@ function blendColors(color1, color2) {
             margin: 20px 0;
             -webkit-appearance: none;
             appearance: none;
-            height: 12px;
-            border-radius: 6px;
-            background: linear-gradient(to right, var(--primary), var(--secondary), var(--light-blue), var(--cream));
+            height: 10px;
+            border-radius: 5px;
+            background: linear-gradient(to right, #ff6b6b, #ffd93d, #6bcf7f);
             outline: none;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .emotion-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 28px;
-            height: 28px;
+            width: 25px;
+            height: 25px;
             border-radius: 50%;
             background: var(--white);
-            border: 4px solid var(--secondary);
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            transition: all 0.3s ease;
-        }
-
-        .emotion-slider::-webkit-slider-thumb:hover {
-            transform: scale(1.1);
-            border-color: var(--primary);
-        }
-
-        .mood-chart {
-            background: var(--white);
-            padding: 20px;
-            border-radius: 20px;
-            margin: 20px 0;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-        }
-
-        .chart-container {
-            width: 100%;
-            height: 200px;
-            position: relative;
-            margin: 15px 0;
-        }
-
-        .chart-line {
-            stroke: var(--secondary);
-            stroke-width: 3;
-            fill: none;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-
-        .chart-point {
-            fill: var(--primary);
-            r: 4;
-            transition: all 0.3s ease;
-        }
-
-        .chart-point:hover {
-            r: 6;
-            fill: var(--secondary);
-        }
-
-        .advice-popup {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: linear-gradient(135deg, var(--white), var(--light-blue));
-            padding: 30px;
-            border-radius: 25px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            z-index: 3000;
-            max-width: 300px;
-            text-align: center;
             border: 3px solid var(--secondary);
-            animation: popIn 0.4s ease-out;
-        }
-
-        @keyframes popIn {
-            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
-            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-        }
-
-        .advice-popup h3 {
-            color: var(--primary);
-            margin-bottom: 15px;
-            font-size: 18px;
-        }
-
-        .advice-popup p {
-            color: var(--secondary);
-            line-height: 1.5;
-            margin-bottom: 20px;
-        }
-
-        .close-advice {
-            background: var(--secondary);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
             cursor: pointer;
-            font-weight: 600;
-        }
-
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 2999;
-        }
-
-        .color-mixing-game {
-            background: var(--white);
-            padding: 25px;
-            border-radius: 25px;
-            margin-bottom: 20px;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-
-        .color-palette {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin: 20px 0;
-        }
-
-        .color-circle {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 3px solid transparent;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 12px;
-        }
-
-        .color-circle:hover {
-            transform: scale(1.1);
-            border-color: var(--primary);
-        }
-
-        .color-circle.selected {
-            border-color: var(--secondary);
-            box-shadow: 0 0 20px rgba(88, 125, 142, 0.5);
-        }
-
-        .mixed-color-result {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            margin: 20px auto;
-            border: 4px solid var(--light-blue);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.5s ease;
-            color: white;
-            font-weight: bold;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-        }
-
-        .puzzle-game {
-            background: var(--white);
-            padding: 25px;
-            border-radius: 25px;
-            margin-bottom: 20px;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-
-        .puzzle-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            max-width: 200px;
-            margin: 20px auto;
-        }
-
-        .puzzle-piece {
-            aspect-ratio: 1;
-            background: var(--light-blue);
-            border: 2px solid var(--secondary);
-            border-radius: 10px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            font-weight: bold;
-            color: var(--primary);
-            transition: all 0.3s ease;
-        }
-
-        .puzzle-piece:hover {
-            background: var(--secondary);
-            color: white;
-        }
-
-        .puzzle-piece.correct {
-            background: var(--secondary);
-            color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
 
         .mood-display {
@@ -1130,34 +581,19 @@ function blendColors(color1, color2) {
                     <div class="scratch-overlay" id="scratchOverlay">
                         Gratta qui! 👆
                     </div>
-                    <div class="hidden-message" id="hiddenMessage">
+                    <div class="hidden-message">
                         Sei incredibile! ⭐
                     </div>
                 </div>
                 <button class="nav-button" onclick="resetScratch()">🔄 Reset</button>
             </div>
 
-            <div class="color-mixing-game">
-                <h3 style="color: var(--primary); margin-bottom: 15px;">Mischia i Colori</h3>
-                <p style="color: var(--secondary); margin-bottom: 20px;">Tocca due colori per mischiarli e rilassarti</p>
-                <div class="color-palette">
-                    <div class="color-circle" style="background-color: #FF6B6B;" onclick="selectColor(this, '#FF6B6B', 'Rosso')">R</div>
-                    <div class="color-circle" style="background-color: #4ECDC4;" onclick="selectColor(this, '#4ECDC4', 'Azzurro')">A</div>
-                    <div class="color-circle" style="background-color: #45B7D1;" onclick="selectColor(this, '#45B7D1', 'Blu')">B</div>
-                    <div class="color-circle" style="background-color: #F7DC6F;" onclick="selectColor(this, '#F7DC6F', 'Giallo')">G</div>
+            <div class="game-container">
+                <h3 style="color: var(--primary); margin-bottom: 15px;">Click Rilassante</h3>
+                <div style="font-size: 60px; cursor: pointer; user-select: none;" onclick="changeEmoji(this)">
+                    😊
                 </div>
-                <div class="mixed-color-result" id="colorResult">
-                    Scegli due colori
-                </div>
-            </div>
-
-            <div class="puzzle-game">
-                <h3 style="color: var(--primary); margin-bottom: 15px;">Puzzle del Giorno</h3>
-                <p style="color: var(--secondary); margin-bottom: 20px;" id="puzzleDate">Risolvi il puzzle di oggi!</p>
-                <div class="puzzle-grid" id="puzzleGrid">
-                    <!-- Puzzle pieces will be generated by JavaScript -->
-                </div>
-                <p style="color: var(--secondary); font-size: 14px; margin-top: 15px;">Ordina i numeri da 1 a 8</p>
+                <p style="color: var(--secondary); margin-top: 10px;">Clicca per cambiare espressione!</p>
             </div>
 
             <button class="back-button" onclick="showScreen('home')">← Home</button>
@@ -1187,16 +623,6 @@ function blendColors(color1, color2) {
                 <button class="nav-button" onclick="saveEntry()">💾 Salva Momento</button>
             </div>
 
-            <div class="mood-chart">
-                <h3 style="color: var(--primary); margin-bottom: 15px; text-align: center;">Grafico dei Tuoi Progressi</h3>
-                <div class="chart-container">
-                    <svg width="100%" height="100%" id="moodChart" viewBox="0 0 300 200">
-                        <!-- Chart will be drawn by JavaScript -->
-                    </svg>
-                </div>
-                <p style="color: var(--secondary); font-size: 14px; text-align: center;">Traccia giornaliera del tuo benessere emotivo</p>
-            </div>
-
             <div id="diaryEntries">
                 <div class="diary-entry">
                     <strong>Oggi - 14:30</strong><br>
@@ -1224,39 +650,39 @@ function blendColors(color1, color2) {
             <div class="game-container">
                 <h3 style="color: var(--primary); margin-bottom: 20px;">Sticker Emotivi</h3>
                 <div class="sticker-grid">
-                    <div class="sticker-item" onclick="shareSticker('🌸 Respira profondo', 'Quando ti senti sopraffatto, fermati e fai tre respiri profondi. Conta fino a 4 inspirando, trattieni per 4, espira per 6. Il tuo sistema nervoso si calmerà naturalmente.')">
+                    <div class="sticker-item" onclick="shareSticker('🌸 Respira profondo')">
                         <span class="sticker-emoji">🌸</span>
                         <div class="sticker-text">Respira profondo</div>
                     </div>
-                    <div class="sticker-item" onclick="shareSticker('💪 Sei forte', 'La tua forza non si misura dall\'assenza di paura, ma dalla capacità di andare avanti nonostante essa. Ogni piccolo passo che fai oggi è una vittoria.')">
+                    <div class="sticker-item" onclick="shareSticker('💪 Sei forte')">
                         <span class="sticker-emoji">💪</span>
                         <div class="sticker-text">Sei forte</div>
                     </div>
-                    <div class="sticker-item" onclick="shareSticker('🌈 Tutto passa', 'Come le nuvole nel cielo, anche i momenti difficili passano. Domani il sole splenderà di nuovo. Abbi pazienza con te stesso.')">
+                    <div class="sticker-item" onclick="shareSticker('🌈 Tutto passa')">
                         <span class="sticker-emoji">🌈</span>
                         <div class="sticker-text">Tutto passa</div>
                     </div>
-                    <div class="sticker-item" onclick="shareSticker('☀️ Sei al sicuro', 'In questo momento, qui e ora, sei al sicuro. Il tuo corpo sa come proteggerti. Ascolta il ritmo calmo del tuo respiro.')">
+                    <div class="sticker-item" onclick="shareSticker('☀️ Sei al sicuro')">
                         <span class="sticker-emoji">☀️</span>
                         <div class="sticker-text">Sei al sicuro</div>
                     </div>
-                    <div class="sticker-item" onclick="shareSticker('🦋 Un passo alla volta', 'Non devi scalare la montagna tutta in una volta. Concentrati sul prossimo passo. Piccoli progressi sono comunque progressi.')">
+                    <div class="sticker-item" onclick="shareSticker('🦋 Un passo alla volta')">
                         <span class="sticker-emoji">🦋</span>
                         <div class="sticker-text">Un passo alla volta</div>
                     </div>
-                    <div class="sticker-item" onclick="shareSticker('💝 Credici', 'Hai già superato il 100% delle tue giornate difficili finora. Questa non sarà diversa. Credi nelle tue capacità.')">
+                    <div class="sticker-item" onclick="shareSticker('💝 Credici')">
                         <span class="sticker-emoji">💝</span>
                         <div class="sticker-text">Credici</div>
                     </div>
-                    <div class="sticker-item" onclick="shareSticker('🌺 Vai avanti', 'Il coraggio non è l\'assenza di paura, ma l\'azione nonostante la paura. Oggi fai un passo avanti, anche se piccolo.')">
+                    <div class="sticker-item" onclick="shareSticker('🌺 Vai avanti')">
                         <span class="sticker-emoji">🌺</span>
                         <div class="sticker-text">Vai avanti</div>
                     </div>
-                    <div class="sticker-item" onclick="shareSticker('⭐ Sei amato', 'Anche quando non lo senti, sei amato. Il tuo valore non dipende dai tuoi risultati. Esisti e questo è già abbastanza.')">
+                    <div class="sticker-item" onclick="shareSticker('⭐ Sei amato')">
                         <span class="sticker-emoji">⭐</span>
                         <div class="sticker-text">Sei amato</div>
                     </div>
-                    <div class="sticker-item" onclick="shareSticker('🕊️ Andrà tutto bene', 'Le tempeste più forti preparano i marinai più esperti. Stai imparando qualcosa di importante da questa esperienza, anche se ora non è chiaro.')">
+                    <div class="sticker-item" onclick="shareSticker('🕊️ Andrà tutto bene')">
                         <span class="sticker-emoji">🕊️</span>
                         <div class="sticker-text">Andrà tutto bene</div>
                     </div>
